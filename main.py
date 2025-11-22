@@ -1,43 +1,45 @@
 from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import time
-import sys
+import os
 
-# Configuration untuk Termux
-options = webdriver.ChromeOptions()
+print("=== TikTok View Bot untuk Termux ===")
+
+# Setup Firefox options
+options = Options()
 options.add_argument('--headless')
 options.add_argument('--no-sandbox')
 options.add_argument('--disable-dev-shm-usage')
 
-def setup_driver():
-    try:
-        driver = webdriver.Chrome(options=options)
-        return driver
-    except Exception as e:
-        print(f"Error: {e}")
-        print("Pastikan chromedriver terinstall di Termux")
-        return None
-
-def main():
-    print("Bot TikTok Views untuk Termux")
+try:
+    print("Membuka Firefox...")
+    driver = webdriver.Firefox(options=options)
     
-    # Setup driver
-    driver = setup_driver()
-    if not driver:
-        return
+    print("Membuka website...")
+    driver.get("https://vipto.de")
     
-    try:
-        # Your automation logic here
-        driver.get("https://vipto.de")
-        print("Browser berhasil dibuka")
-        
-        # Tambahkan logika automasi sesuai kebutuhan
-        # ...
-        
-    except Exception as e:
-        print(f"Error: {e}")
-    finally:
-        driver.quit()
-
-if __name__ == "__main__":
-    main()
+    # Tunggu hingga halaman loading
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.TAG_NAME, "body"))
+    )
+    
+    print(f"Berhasil! Title: {driver.title}")
+    print(f"URL: {driver.current_url}")
+    
+    # Simpan screenshot untuk debug
+    driver.save_screenshot("screenshot.png")
+    print("Screenshot disimpan sebagai screenshot.png")
+    
+    # Tunggu sebentar lalu close
+    time.sleep(5)
+    driver.quit()
+    print("Browser ditutup. Test berhasil!")
+    
+except Exception as e:
+    print(f"ERROR: {str(e)}")
+    print("\nTips troubleshooting:")
+    print("1. Pastikan Firefox terinstall: pkg install firefox")
+    print("2. Pastikan geckodriver terinstall")
